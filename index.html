@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>✏️ 글 작성기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+      <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6097617241369024"
+     crossorigin="anonymous"></script>
+  <style>
+    @font-face {
+      font-family: 'Ridibatang';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/RIDIBatang.woff') format('woff');
+      font-weight: normal;
+      font-display: swap;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --editor-font-size: 16px;
+    }
+
+    body {
+      font-family: 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #1a1f3a 0%, #2d4578 30%, #4a6fa5 60%, #ff8a65 85%, #ffab91 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 파도 애니메이션 */
+    @keyframes wave {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      25% { transform: translateX(-5%) translateY(-2%); }
+      50% { transform: translateX(-10%) translateY(0); }
+      75% { transform: translateX(-5%) translateY(2%); }
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse at 30% 60%, rgba(74, 111, 165, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 40%, rgba(255, 138, 101, 0.25) 0%, transparent 50%);
+      animation: wave 15s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 950px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      padding: 40px;
+      border-radius: 32px;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #2d4578 0%, #ff8a65 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .home-btn {
+      background: linear-gradient(135deg, #4a6fa5 0%, #2d4578 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+    }
+
+    .home-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(74, 111, 165, 0.4);
+    }
+
+    h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #2d4578;
+      margin: 20px 0 12px 0;
+    }
+
+    .columns {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .column {
+      flex: 1 1 45%;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .column-header h3 {
+      margin: 0;
+    }
+
+    textarea {
+      flex: 1 1 auto;
+      min-height: 220px;
+      font-size: var(--editor-font-size) !important;
+      line-height: 1.7;
+      padding: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 14px;
+      background: #f8f9fa;
+      color: #222;
+      resize: vertical;
+      font-family: 'Ridibatang', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #4a6fa5;
+      box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.15);
+    }
+
+    textarea::placeholder {
+      color: #999;
+    }
+
+    button {
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #f0f0f0;
+      color: #333;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    button:hover {
+      background: #e0e0e0;
+      transform: translateY(-1px);
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #4a6fa5 0%, #2d4578 100%);
+      color: white;
+      padding: 8px 14px;
+      font-size: 14px;
+    }
+
+    .copy-btn:hover {
+      box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3);
+    }
+
+    .textarea-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .symbol-box {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .symbol-box button {
+      font-size: 16px;
+      padding: 6px 12px;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      min-width: 38px;
+    }
+
+    .symbol-box button:hover {
+      background: #e3f2fd;
+      border-color: #4a6fa5;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .util-btn {
+      padding: 6px 10px;
+      font-size: 15px;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+    }
+
+    .util-btn:hover {
+      background: #e3f2fd;
+      border-color: #4a6fa5;
+    }
+
+    /* 글꼴 크기 조절 */
+    .font-controls {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .font-controls button {
+      font-size: 16px;
+      padding: 4px 10px;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+    }
+
+    .font-controls button:hover {
+      background: #e3f2fd;
+      border-color: #4a6fa5;
+    }
+
+    #fontSizeDisplay {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d4578;
+      min-width: 45px;
+      text-align: center;
+    }
+
+    /* 미리보기 */
+    .preview {
+      min-height: 100px;
+      border: 2px solid #e0e0e0;
+      padding: 14px;
+      white-space: pre-wrap;
+      background: #f8f9fa;
+      font-size: var(--editor-font-size);
+      line-height: 1.6;
+      border-radius: 14px;
+      overflow-wrap: break-word;
+      font-family: 'Ridibatang', inherit;
+    }
+
+    /* 기호 스타일 */
+    .quote {
+      color: #1565c0;
+      background-color: #e3f2fd;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+
+    .thought {
+      color: #2e7d32;
+      background-color: #e8f5e9;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+
+    .desc {
+      color: #546e7a;
+      font-style: italic;
+      background-color: #eceff1;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+
+    .bold {
+      font-weight: 700;
+      background-color: #fff9c4;
+      color: #f57f17;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+
+    .strike {
+      text-decoration: line-through;
+      color: #c62828;
+      background-color: #ffebee;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+
+    .memo {
+      font-size: 0.85em;
+      color: #666;
+      background-color: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    /* 통계 */
+    #stats {
+      text-align: right;
+      font-weight: 600;
+      color: #2d4578;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    /* 컨트롤 버튼들 */
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .controls button {
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      padding: 10px 16px;
+    }
+
+    .controls button:hover {
+      background: #e3f2fd;
+      border-color: #4a6fa5;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, #ff8a65 0%, #ff7043 100%) !important;
+      color: white !important;
+      border: none !important;
+      font-weight: 600;
+    }
+
+    .save-btn:hover {
+      box-shadow: 0 4px 15px rgba(255, 138, 101, 0.4);
+    }
+
+    /* 버전 목록 */
+    #versionListContainer {
+      margin-top: 25px;
+    }
+
+    #versionListContainer strong {
+      color: #2d4578;
+      font-size: 15px;
+    }
+
+    #versionList {
+      max-height: 150px;
+      overflow-y: auto;
+      border: 2px solid #e0e0e0;
+      padding: 10px;
+      border-radius: 12px;
+      margin-top: 8px;
+      background: #f8f9fa;
+    }
+
+    .version-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .version-item:hover {
+      background: #e3f2fd;
+    }
+
+    .version-item:last-child {
+      margin-bottom: 0;
+      border-bottom: none;
+    }
+
+    .version-item button {
+      background: #ffebee;
+      color: #c62828;
+      border: none;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 14px;
+    }
+
+    .version-item button:hover {
+      background: #ffcdd2;
+    }
+
+    /* 모달 */
+    #overlay {
+      position: fixed;
+      display: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+    }
+
+    #helpModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      color: #222;
+      max-width: 380px;
+      width: 90%;
+      padding: 25px 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      z-index: 1001;
+    }
+
+    #helpModal h2 {
+      color: #2d4578;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+
+    #helpModal ul {
+      padding-left: 20px;
+      line-height: 1.8;
+    }
+
+    #helpModal code {
+      background: #e3f2fd;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 20px;
+      color: #888;
+      transition: color 0.3s;
+    }
+
+    .modal-close:hover {
+      color: #2d4578;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 32px;
+      animation: float-wave 3s ease-in-out infinite;
+    }
+
+    @keyframes float-wave {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-6px) rotate(-3deg); }
+      75% { transform: translateY(-6px) rotate(3deg); }
+    }
+
+    /* 반응형 */
+    @media screen and (max-width: 700px) {
+      .container {
+        padding: 25px 20px;
+        border-radius: 24px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .columns {
+        flex-direction: column;
+      }
+
+      .column {
+        min-width: 100%;
+      }
+
+      textarea {
+        min-height: 180px;
+      }
+
+      .textarea-controls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .symbol-box {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .button-group {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>✏️ 글 작성기</h1>
+      <button class="home-btn" id="main-link-btn" title="돌아가기">🌊</button>
+    </div>
+
+    <div class="columns">
+      <div class="column">
+        <div class="column-header">
+          <h3>📋 참고 글</h3>
+        </div>
+        <textarea id="refText" placeholder="참고할 내용을 붙여넣으세요."></textarea>
+        <div class="textarea-controls">
+          <span></span>
+          <div class="button-group">
+            <button class="util-btn" id="ref-translate-ko-en" title="한→영 번역">🇬🇧</button>
+            <button class="util-btn" id="ref-translate-en-ko" title="영→한 번역">🇰🇷</button>
+            <button class="util-btn" id="ref-spell-check" title="맞춤법 검사">🔍</button>
+            <button class="copy-btn" onclick="copyWithFeedback(this, 'refText')">복사</button>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="column-header">
+          <h3>✏️ 내 글</h3>
+          <div class="font-controls">
+            <button id="decreaseFontBtn" title="글자 작게">−</button>
+            <span id="fontSizeDisplay">16px</span>
+            <button id="increaseFontBtn" title="글자 크게">+</button>
+          </div>
+        </div>
+        <textarea id="myText" placeholder="여기에 글을 작성하세요."></textarea>
+        <div class="textarea-controls">
+          <div class="button-group">
+            <button class="util-btn" id="my-translate-ko-en" title="한→영 번역">🇬🇧</button>
+            <button class="util-btn" id="my-translate-en-ko" title="영→한 번역">🇰🇷</button>
+            <button class="util-btn" id="my-spell-check" title="맞춤법 검사">🔍</button>
+            <button class="copy-btn" onclick="copyWithFeedback(this, 'myText')">복사</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>💭 미리보기</h3>
+    <div class="preview" id="previewBox" aria-live="polite"></div>
+
+    <div id="stats" aria-live="polite"></div>
+
+    <div class="controls" aria-label="버전 및 기타 조작 버튼">
+      <button class="save-btn" onclick="saveVersion()" title="Ctrl + S">💾 저장</button>
+      <button onclick="clearText()">🧹 초기화</button>
+      <button onclick="downloadText()">📤 내보내기</button>
+    </div>
+
+    <div id="versionListContainer" aria-label="이전 버전 목록">
+      <strong>📚 이전 버전</strong>
+      <div id="versionList"></div>
+    </div>
+
+    <div class="footer">🌊</div>
+  </div>
+
+    <div class="modal-close" onclick="closeHelp()" aria-label="닫기">×</div>
+    <h2 id="helpTitle">✨ 기호 사용법</h2>
+    <div>
+      <p style="margin-bottom: 12px;"><strong>기호별 역할</strong></p>
+      <ul>
+        <li><code>" "</code> 또는 <code>" "</code> : 대사 (파란색)</li>
+        <li><code>' '</code> : 생각 표현 (초록색)</li>
+        <li><code>* *</code> : 묘사 강조 (회색, 기울임)</li>
+        <li><code>/ /</code> : 굵은 강조 (노란색)</li>
+        <li><code>~ ~</code> : 삭제선 (빨간색)</li>
+        <li><code>_ _</code> : 메모 스타일</li>
+      </ul>
+      <p style="margin: 15px 0 12px;"><strong>단축키</strong></p>
+      <ul>
+        <li><strong>Ctrl + S</strong> : 현재 내용 저장</li>
+        <li><strong>Alt + 1~4</strong> : 주요 기호 삽입</li>
+      </ul>
+      <p style="margin-top: 15px; font-size: 14px; color: #666;">버전 목록에서 클릭하면 불러올 수 있어요.</p>
+    </div>
+  </div>
+
+  <script>
+    const refText = document.getElementById('refText');
+    const myText = document.getElementById('myText');
+    const previewBox = document.getElementById('previewBox');
+    const versionList = document.getElementById('versionList');
+
+    const increaseFontBtn = document.getElementById('increaseFontBtn');
+    const decreaseFontBtn = document.getElementById('decreaseFontBtn');
+    const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+
+    let currentFontSize = 16;
+
+    // 홈 버튼
+    document.getElementById('main-link-btn').addEventListener('click', () => {
+      window.location.href = "https://lagetom.github.io/ash/";
+    });
+
+    function applyFontSize() {
+      document.documentElement.style.setProperty('--editor-font-size', `${currentFontSize}px`);
+      fontSizeDisplay.textContent = `${currentFontSize}px`;
+    }
+
+    function changeFontSize(amount) {
+      currentFontSize += amount;
+      if (currentFontSize < 12) currentFontSize = 12;
+      if (currentFontSize > 28) currentFontSize = 28;
+      applyFontSize();
+      localStorage.setItem('rp_fontSize', currentFontSize);
+    }
+
+    increaseFontBtn.addEventListener('click', () => changeFontSize(1));
+    decreaseFontBtn.addEventListener('click', () => changeFontSize(-1));
+
+    function copyWithFeedback(btn, id) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.value).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = '✅ 완료!';
+        setTimeout(() => {
+          btn.innerText = originalText;
+        }, 1500);
+      }).catch(() => {
+        alert('복사에 실패했습니다.');
+      });
+    }
+
+    function updatePreview() {
+      let rawText = myText.value;
+      rawText = rawText.replace(/['']/g, "'");
+
+      let html = rawText;
+      html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      html = html.replace(/\n/g, '<br>');
+      previewBox.innerHTML = html;
+    }
+
+    function updateStats() {
+      const text = myText.value;
+      const charCount = text.length;
+      const lineCount = text ? text.split('\n').length : 0;
+      const wordCount = text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
+      document.getElementById('stats').innerText = `글자수: ${charCount}자 / 줄수: ${lineCount}줄 / 단어수: ${wordCount}개`;
+    }
+
+    function updatePreviewAndStats() {
+      updatePreview();
+      updateStats();
+    }
+
+    const STORAGE_KEY = 'rp_versions';
+
+    function saveVersion() {
+      let content = myText.value.trim();
+      if (!content) {
+        alert('내용이 비어있으면 저장할 수 없습니다.');
+        return;
+      }
+      let versions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const timestamp = new Date().toLocaleString('ko-KR');
+      versions.unshift({ time: timestamp, text: content });
+      if (versions.length > 20) versions.pop();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(versions));
+      renderVersionList();
+      alert(`버전이 저장되었습니다 (${timestamp})`);
+    }
+
+    function renderVersionList() {
+      let versions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      versionList.innerHTML = '';
+      if (versions.length === 0) {
+        versionList.innerHTML = '<em style="color: #888; font-size: 14px;">저장된 버전이 없습니다.</em>';
+        return;
+      }
+      versions.forEach((v, idx) => {
+        const div = document.createElement('div');
+        div.className = 'version-item';
+        div.innerHTML = `<span>${v.time}</span>
+          <button title="삭제" aria-label="버전 삭제" onclick="event.stopPropagation(); deleteVersion(${idx})">×</button>
+        `;
+        div.onclick = (e) => {
+          if (e.target.tagName === 'BUTTON') return;
+          if (confirm('이 버전을 불러오시겠습니까? 현재 작성 중인 내용은 사라집니다.')) {
+            myText.value = versions[idx].text;
+            updatePreviewAndStats();
+          }
+        };
+        versionList.appendChild(div);
+      });
+    }
+
+    function deleteVersion(idx) {
+      let versions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if (!confirm('이 버전을 정말 삭제하시겠습니까?')) return;
+      versions.splice(idx, 1);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(versions));
+      renderVersionList();
+    }
+
+    function clearText() {
+      if (confirm('모든 작성 내용을 초기화하시겠습니까?')) {
+        myText.value = '';
+        updatePreviewAndStats();
+      }
+    }
+
+    function downloadText() {
+      const text = myText.value;
+      if (!text.trim()) {
+        alert('내용이 비어있으면 내보낼 수 없습니다.');
+        return;
+      }
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'my_text.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function openTranslator(elementId, sl, tl) {
+      const text = document.getElementById(elementId).value.trim();
+      if (!text) return;
+      window.open(`https://translate.google.com/?sl=${sl}&tl=${tl}&text=${encodeURIComponent(text)}&op=translate`, '_blank');
+    }
+
+    function openSpellChecker(elementId) {
+      const text = document.getElementById(elementId).value.trim();
+      if (!text) return;
+      try {
+        navigator.clipboard.writeText(text).then(() => {
+          alert('내용이 복사되었습니다. 맞춤법 검사기 사이트에 붙여넣으세요.');
+          window.open('https://nara-speller.co.kr/speller', '_blank');
+        });
+      } catch (err) {
+        alert('복사에 실패했습니다.');
+      }
+    }
+
+    document.getElementById('ref-translate-ko-en').addEventListener('click', () => openTranslator('refText', 'ko', 'en'));
+    document.getElementById('ref-translate-en-ko').addEventListener('click', () => openTranslator('refText', 'en', 'ko'));
+    document.getElementById('ref-spell-check').addEventListener('click', () => openSpellChecker('refText'));
+    document.getElementById('my-translate-ko-en').addEventListener('click', () => openTranslator('myText', 'ko', 'en'));
+    document.getElementById('my-translate-en-ko').addEventListener('click', () => openTranslator('myText', 'en', 'ko'));
+    document.getElementById('my-spell-check').addEventListener('click', () => openSpellChecker('myText'));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        saveVersion();
+      }
+    });
+
+    myText.addEventListener('input', () => {
+      localStorage.setItem('rp_myText', myText.value);
+      updatePreviewAndStats();
+    });
+
+    refText.addEventListener('input', () => {
+      localStorage.setItem('rp_refText', refText.value);
+    });
+
+    window.onload = () => {
+      const savedFontSize = localStorage.getItem('rp_fontSize');
+      if (savedFontSize) {
+        currentFontSize = parseInt(savedFontSize, 10);
+      }
+      applyFontSize();
+
+      myText.value = localStorage.getItem('rp_myText') || '';
+      refText.value = localStorage.getItem('rp_refText') || '';
+      renderVersionList();
+      updatePreviewAndStats();
+    };
+  </script>
+</body>
+</html>
